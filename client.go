@@ -65,6 +65,10 @@ type Client struct {
 	// by Pusher will be sent to this channel.
 	Errors chan error
 
+	// used for testing
+	OverrideHost string
+	OverridePort int
+
 	socketID string
 	// TODO: make this configurable
 	activityTimeout time.Duration
@@ -81,10 +85,6 @@ type Client struct {
 	subscribedChannels subscribedChannels
 
 	mutex sync.RWMutex
-
-	// used for testing
-	overrideHost string
-	overridePort int
 }
 
 type connectionData struct {
@@ -109,16 +109,16 @@ func (c *Client) generateConnURL(appKey string) string {
 	if c.Insecure {
 		scheme, port = insecureScheme, insecurePort
 	}
-	if c.overridePort != 0 {
-		port = c.overridePort
+	if c.OverridePort != 0 {
+		port = c.OverridePort
 	}
 
 	host := defaultHost
 	if c.Cluster != "" {
 		host = fmt.Sprintf(clusterHostFormat, c.Cluster)
 	}
-	if c.overrideHost != "" {
-		host = c.overrideHost
+	if c.OverrideHost != "" {
+		host = c.OverrideHost
 	}
 
 	return fmt.Sprintf(connURLFormat, scheme, host, port, appKey, protocolVersion)
